@@ -10,7 +10,7 @@ df <- data.frame(Names = c(rep('Dan',50),rep('Dave',100)),
                 Dates = c(seq(1,100,by=2),seq(1,100,by=1)),
                 Values = rnorm(150,0,1))
 
-groupLag <- function(mydf,grouping,ranking,lag){
+groupLag <- function(mydf,grouping=NULL,ranking='Date',lag=1,lagValue='Values'){
   df <- mydf
   groupL <- lapply(grouping,as.symbol)
   
@@ -19,16 +19,16 @@ groupLag <- function(mydf,grouping,ranking,lag){
   
   df <- df %>% group_by_(.dots=groupL) %>% mutate_(.dots=setNames(foos,names))
   
-  selectedNames <- c('Rank','Values',grouping)
+  selectedNames <- c('Rank',lagValue,grouping)
   df2 <- df %>% select_(.dots=selectedNames)
-  colnames(df2) <- c('Rank','ValueDown',grouping)
+  colnames(df2) <- c('Rank','lagValue',grouping)
   
   df <- df %>% left_join(df2,by=c('RankDown'='Rank',grouping)) %>% select(-Rank,-RankDown)
   
   return(df)
 }
 
-groupLag(df,c('Names'),c('Dates'),1)
+groupLag(df,c('Names'),c('Dates'),1,'Values')
 
 
 
